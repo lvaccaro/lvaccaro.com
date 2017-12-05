@@ -1,0 +1,255 @@
+<!doctype html>
+<html>
+
+<body>
+
+<!-- STYLE -->
+<style>
+#container {
+  position: absolute;
+  height:100%;
+  width:100%;
+  }
+  #c {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -260px;
+}
+
+.bubble-effect {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  float: left;
+}
+
+.bubble-effect img{
+  width:100%;
+  height:100%;
+}
+
+body{
+	background: black;
+}
+#logo{
+	position: absolute;
+	background: url("logo.png");
+    width: 287px;
+    height: 60px;
+    top:50%;
+    left:50%;
+    margin-top: -30px;
+    margin-left: -143px;
+}
+
+.bubble-effect:hover.yellow{
+  -webkit-transition	: all 1.5s;
+  -moz-transition		: all 1.5s;
+  transition			: all 1.5s;
+  animation				: r0 0.5s 0.4s ease-out infinite;
+  -webkit-animation		: r0 0.5s 0.4s ease-out infinite;
+  -moz-animation		: r0 0.5s 0.4s ease-out infinite;
+}
+.bubble-effect:hover.green{
+  -webkit-transition	: all 1.5s;
+  -moz-transition		: all 1.5s;
+  transition			: all 1.5s;
+  animation				: r1 0.5s 0.4s ease-out infinite;
+  -webkit-animation		: r1 0.5s 0.4s ease-out infinite;
+  -moz-animation		: r1 0.5s 0.4s ease-out infinite;
+}
+
+@-webkit-keyframes r0 {
+  0% {
+    box-shadow: 0 0 5px 6px #f4e9bf, 0 0 0px 0px #0270b9, 0 0 0px 0px #f5ecc1;
+  }
+  20% {
+    box-shadow: 0 0 5px 6px #f5e9c1, 0 0 15px 5px #e5c76c, 0 0 12px 10px #e5c86f;
+  }
+  100% {
+    box-shadow: 0 0 5px 0px #0270b9, 0px 0px 15px 30px #f5e9c1, 0 0 0px 30px #e5c86f;
+  }
+}
+
+
+@-webkit-keyframes r1 {
+  0% {
+    box-shadow: 0 0 5px 6px #04e9bf, 0 0 0px 0px #0270b9, 0 0 0px 0px #05ecc1;
+  }
+  20% {
+    box-shadow: 0 0 5px 6px #05e9c1, 0 0 15px 5px #05c76c, 0 0 12px 10px #05c86f;
+  }
+  100% {
+    box-shadow: 0 0 5px 0px #0270b9, 0px 0px 15px 30px #05e9c1, 0 0 0px 30px #05c86f;
+  }
+}
+
+#footer{
+	color: #f0f0f0;
+	font-family:  'Courier New';
+	position: absolute;
+    bottom: 0px;
+    z-index: -10;
+}
+</style>
+
+
+
+
+<!-- HTML CONTAINER -->
+<div id='container'>
+</div>
+<div id='logo'>
+</div>
+<div id='footer'>
+Luca Vaccaro<br>
+<br>
+GPG: a36735b750107c1893ef36abfba046ea74b001c1<br>
+Email: luck87@gmail.com<br>
+Twitter: https://twitter.com/0xVaccaro<br>
+Github: https://github.com/lvaccaro<br>
+Linkedin: https://www.linkedin.com/in/luca-vaccaro-7408274b<br>
+</div>
+
+<!-- LIBRARIES -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+
+<!-- APP SCRIPT -->
+<script>
+function getPositions(size){
+	var x = Math.random();
+	var y = Math.random();
+
+	var maxY = $( window ).height();
+	var logoY = $("#logo").height();
+
+	var maxX = $( window ).width();
+	var logoX = $("#logo").width();
+
+	if ( (y*maxY>(maxY/2-logoY/2-size-8)) &&  (y*maxY<(maxY/2+logoY/2)) &&
+		 (x*maxX>(maxX/2-logoX/2-size)) &&  (x*maxX<(maxX/2+logoX/2)) ){
+		//console.log("retry");
+		var pos=getPositions(size);
+		//console.log(pos);
+		return pos;
+	} else if (x*maxX>(maxX-size)){
+		return getPositions(size);
+	} else if (y*maxY>(maxY-size)){
+		return getPositions(size);
+	} 
+
+	return {"x": x*100+"%", "y": y*100+"%"};
+}
+function logSize(value) {
+   // position will be between 0 and 100
+  var minp = 0;
+  var maxp = 50;
+
+  // The result should be between 100 an 10000000
+  var minv = Math.log(1000);
+  var maxv = Math.log(10000000000);
+
+  // calculate adjustment factor
+  var scale = (maxv-minv) / (maxp-minp);
+   return (Math.log(value)-minv) / scale + minp;
+}
+
+function moveNeighbour(self){
+	var selfTop=$(self).offset().top;
+   	var selfLeft=$(self).offset().left;
+   	var selfHeight=$(self).height();
+   	var selfWidth=$(self).width();
+   	var selfMargin=20;
+   	$.each( $(".bubble-effect"), function( key, nearItem ) {
+		if ($(nearItem).attr("id") === $(self).attr("id")){
+			return;
+		}
+		var diffY=selfTop+selfHeight/2 - ($(nearItem).offset().top+$(nearItem).height()/2);
+		var diffX=selfLeft+selfWidth/2 - ($(nearItem).offset().left+$(nearItem).width()/2);
+
+		if (( diffY > -selfHeight/2-selfMargin && diffY < selfHeight/2+selfMargin) && 
+          ( diffX > -selfWidth/2-selfMargin && diffX < selfWidth/2+selfMargin )) {
+    
+          var moveY=( selfHeight/2 - Math.abs(diffY) + selfMargin);
+          var moveX=( selfWidth/2 - Math.abs(diffX) + selfMargin);
+    
+          $(nearItem).animate({
+				marginTop: Math.sign(diffY)*moveY*(-1),
+        marginLeft: Math.sign(diffX)*moveX*(-1)
+			});
+    //$(nearItem).css("display","none");
+      console.log("Y: "+moveY+" - X: "+moveX);
+		}
+	});
+}
+
+function refresh(){
+$.getJSON( "https://api.coinmarketcap.com/v1/ticker/?limit=1000", function( data ) {
+  $.each( data, function( key, item ) {
+    
+    var size = logSize(item.market_cap_usd);
+    if(size == -Infinity || size < 12)
+    	size = 12;
+
+    var positions = getPositions(size);
+
+    var bubble = document.createElement('div');
+		$(bubble).addClass("bubble-effect")
+    .css("position","absolute")
+    .css("top",positions.y)
+    .css("left",positions.x)
+    .css("width",size)
+    .css("height",size)
+    .attr("id",item.id);
+
+    // image resolution by size
+    if (size<16){
+    	$(bubble).html('<img src="https://files.coinmarketcap.com/static/img/coins/16x16/'+item.id+'.png"/>')
+    } else if (size<32){
+    	$(bubble).html('<img src="https://files.coinmarketcap.com/static/img/coins/16x16/'+item.id+'.png"/>')
+    } else if (size<64){
+    	$(bubble).html('<img src="https://files.coinmarketcap.com/static/img/coins/32x32/'+item.id+'.png"/>')
+    } else if (size<128){
+    	$(bubble).html('<img src="https://files.coinmarketcap.com/static/img/coins/128x128/'+item.id+'.png"/>')
+    }
+
+	// set name attr based on percent_change_24h   
+    if(item.percent_change_24h<0){
+    	$(bubble).attr("name","yellow");
+    } else if(item.percent_change_24h>0){
+    	$(bubble).attr("name","green");
+    }
+
+    //set hover action
+   $(bubble).hover(function(e){
+   		$(this).css("z-index","100");
+   		$(this).addClass($(this).attr("name"));
+   		var self=this;
+   		moveNeighbour(self);
+
+	}, function(e){
+   		$(this).removeClass($(this).attr("name"));
+    });
+   	//set click action
+   $(bubble).click(function(e){
+		window.open('https://coinmarketcap.com/currencies/'+$(this).attr("id"), '_blank');
+	});
+	//append   
+    $(bubble).appendTo($("#container"));
+    
+  });
+  
+});
+}
+$( document ).ready(function() {
+    refresh();
+});
+
+</script>
+</body>
+
+</html>
